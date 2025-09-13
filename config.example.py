@@ -1,0 +1,4 @@
+SQLITE_DB_PATH = 'db.sqlite'
+SERVER_HOST = '0.0.0.0'
+SERVER_PORT = 8080
+SERVER_DEBUG = True

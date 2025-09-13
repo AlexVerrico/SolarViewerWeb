@@ -1,0 +1,14 @@
+{% extends "layout.jinja" %}
+{% block title %}
+Home
+{% endblock %}
+{% block main %}
+<div class="jumbotron">
+    <h1 class="display-4">Solar viewer</h1>
+    <ul style="font-size: 20px">
+        {% for data_type in monitored_fields.keys() %}
+            <li><b><a href="{{ url_for('data_viewer', data_type=data_type) }}">{{data_type}}</a></b><br/><br/></li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "layout.jinja" %}
+{% block title %}
+View {{ data_type }}
+{% endblock %}
+{% block main %}
+<div class="jumbotron">
+    <h1 class="display-4">View {{ data_type }}</h1>
+
+    <a href="/">Back</a>
+
+    {% set time_since = (now - data[-1][0])|int %}
+    {% if time_since > 60 and time_since < 3600 %}
+        {% set hours = 0 %}
+        {% set minutes = time_since // 60 %}
+        {% set seconds = time_since % 60 %}
+    {% elif time_since > 3600 %}
+        {% set hours = time_since // 3600 %}
+        {% set remainder = time_since % 3600 %}
+        {% set minutes = remainder // 60 %}
+        {% set seconds = remainder % 60 %}
+    {% else %}
+        {% set hours = 0 %}
+        {% set minutes = 0 %}
+        {% set seconds = time_since %}
+    {% endif %}
+
+    <p>Latest Value: <b>{{ data[-1][2] }} ({{ '%02d' % hours }}:{{ '%02d' % minutes }}:{{ '%02d' % seconds }} ago)</b></p>
+
+    <img src="{{ url_for('graph', data_type=data_type) }}" width="100%">
+
+    <p><span id="time_since_load">0</span> seconds since page load</p>
+    <script>
+        let time_since_load = 0;
+        setInterval(() => {
+            time_since_load += 1;
+            document.getElementById("time_since_load").textContent = time_since_load;
+        }, 1000);
+    </script>
+</div>
+{% endblock %}
