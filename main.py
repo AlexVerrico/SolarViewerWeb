@@ -37,7 +37,17 @@ def graph(data_type):
     now = datetime.datetime.utcnow().timestamp()
     start_timestamp = request.args.get('start_timestamp', now - 24 * 60 * 60)
     end_timestamp = request.args.get('end_timestamp', now)
-    granularity = request.args.get('granularity', 30 * 60)
+    hours = ((end_timestamp - start_timestamp) / 60) / 60
+    granularity = request.args.get('granularity', None)
+    if granularity is None:
+        if hours <= 6:
+            granularity = 1  * 60
+        elif 6 < hours <= 12:
+            granularity = 5 * 60
+        elif 24 >= hours > 12:
+            granularity = 10 * 60
+        else:
+            granularity = 60 * 60
 
     with sqlite3.connect(db_file) as conn:
         cursor = conn.cursor()
@@ -52,19 +62,31 @@ def graph(data_type):
     output = [
         (data[0][0], data[0][1], data[0][2], transform_date(data[0][0])),
     ]
+    last_row = None
     for row in data:
         if row[0] > output[-1][0] + granularity:
             output.append((row[0], row[1], row[2], transform_date(row[0])))
-
+        last_row = row
+    output.append((last_row[0], last_row[1], last_row[2], transform_date(last_row[0])))
 
     fig = plt.figure(dpi=128, figsize=(16, 9))
-    plt.title(data_type, fontsize=24)
+    plt.title(f'{data_type} - {hours} hours to {str(datetime.datetime.fromtimestamp(output[-1][0]) + datetime.timedelta(hours=10))}', fontsize=24)
     plt.plot([row[3] for row in output], [row[2] for row in output])
+    last_annotated = None
+    count_since_annotated = 0
     for row in output:
+        count_since_annotated += 1
+        if last_annotated == row[2] and count_since_annotated < 5:
+            continue
+        if last_annotated is not None and count_since_annotated < 5:
+            if last_annotated * 1.01 > row[2] > last_annotated * 0.999:
+                continue
         plt.annotate(xy=(transform_date(row[0]), row[2]), text=row[2])
+        last_annotated = row[2]
+        count_since_annotated = 0
     plt.ylim(monitored_fields[data_type]['limits']['min'], monitored_fields[data_type]['limits']['max'])
     plt.xlabel('Time', fontsize=16)
-    plt.ylabel('Value', fontsize=16)
+    plt.ylabel(monitored_fields[data_type]['unit'], fontsize=16)
     plt.tick_params(axis='both', which='major', labelsize=6)
     plt.legend()
 
