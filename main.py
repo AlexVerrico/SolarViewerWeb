@@ -85,7 +85,7 @@ def graph(data_type):
             if last_annotated * 1.01 > row[2] > last_annotated * 0.999:
                 continue
         plt.annotate(xy=(transform_date(row[0]), row[2]), text=row[2], textcoords='offset fontsize', color=colors[annotate_color],
-                     xytext=(0, 0.2 if annotate_pos == 'top' else -1.2), arrowprops={'width': 0.1, 'headwidth': 4, 'headlength': 3, 'shrink': .05, 'facecolor': colors[annotate_color]})
+                     xytext=(0, 0.2 if annotate_pos == 'top' else -1.2), arrowprops={'width': 0.1, 'headwidth': 4, 'headlength': 3, 'shrink': .05, 'color': colors[annotate_color]})
         last_annotated = row[2]
         if annotate_pos == 'top': annotate_pos = 'bottom'
         elif annotate_pos == 'bottom': annotate_pos = 'top'
