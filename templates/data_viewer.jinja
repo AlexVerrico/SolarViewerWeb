@@ -24,11 +24,11 @@ View {{ data_type }}
         {% set seconds = time_since %}
     {% endif %}
 
-    <p>Latest Value: <b>{{ data[-1][2] }} ({{ '%02d' % hours }}:{{ '%02d' % minutes }}:{{ '%02d' % seconds }} ago)</b></p>
+    <p>Latest Value: <b>{{ data[-1][2] }} ({{ '%02d' % hours }}:{{ '%02d' % minutes }}:{{ '%02d' % seconds }} ago)</b><br/>
+    <span id="time_since_load">0</span> seconds since page load</p><br/>
 
     <img src="{{ url_for('graph', data_type=data_type) }}" width="100%">
 
-    <p><span id="time_since_load">0</span> seconds since page load</p>
     <script>
         let time_since_load = 0;
         setInterval(() => {
